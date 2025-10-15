@@ -13,7 +13,8 @@
         "laravel/sanctum": "^4.2",
         "laravel/tinker": "^2.10.1",
         "league/csv": "^9.26",
-        "ramsey/uuid": "^4.9"
+        "ramsey/uuid": "^4.9",
+        "tymon/jwt-auth": "^2.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

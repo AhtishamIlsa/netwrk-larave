@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
@@ -37,15 +37,15 @@ Route::prefix('auth')->group(function () {
 
 // Users Routes (matching NestJS structure)
 Route::prefix('users')->group(function () {
-    Route::get('/graph/contact-industry', [UserController::class, 'getGraphData'])->middleware('auth:sanctum');
-    Route::post('/delete', [UserController::class, 'deleteUsers'])->middleware('auth:sanctum');
+    Route::get('/graph/contact-industry', [UserController::class, 'getGraphData'])->middleware('auth:api');
+    Route::post('/delete', [UserController::class, 'deleteUsers'])->middleware('auth:api');
     Route::delete('/delete/secondary-profile', [UserController::class, 'deleteUsersSecondaryProfile']);
-    Route::patch('/update-profile', [UserController::class, 'updateProfile'])->middleware('auth:sanctum');
-    Route::post('/secondry-profile', [UserController::class, 'createUserSecondryProfile'])->middleware('auth:sanctum');
-    Route::post('/socials-preferences', [UserController::class, 'updateUserSocialsPreferences'])->middleware('auth:sanctum');
-    Route::get('/me', [UserController::class, 'me'])->middleware('auth:sanctum');
-    Route::get('/dashboard', [UserController::class, 'dashboard'])->middleware('auth:sanctum');
-    Route::get('/dashboard/graph/location', [UserController::class, 'getUserLocationGraph'])->middleware('auth:sanctum');
+    Route::patch('/update-profile', [UserController::class, 'updateProfile'])->middleware('auth:api');
+    Route::post('/secondry-profile', [UserController::class, 'createUserSecondryProfile'])->middleware('auth:api');
+    Route::post('/socials-preferences', [UserController::class, 'updateUserSocialsPreferences'])->middleware('auth:api');
+    Route::get('/me', [UserController::class, 'me'])->middleware('auth:api');
+    Route::get('/dashboard', [UserController::class, 'dashboard'])->middleware('auth:api');
+    Route::get('/dashboard/graph/location', [UserController::class, 'getUserLocationGraph'])->middleware('auth:api');
     Route::get('/industries', [UserController::class, 'getIndustries']);
 });
 

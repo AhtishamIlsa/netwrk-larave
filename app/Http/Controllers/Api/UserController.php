@@ -56,6 +56,7 @@ class UserController extends Controller
         ];
 
         return response()->json([
+            'statusCode' => 200,
             'message' => 'Success',
             'data' => $data
         ]);
@@ -359,9 +360,67 @@ class UserController extends Controller
         $user = $request->user();
         $user->load('userProfiles');
 
+        // Format socials preference to match NestJS structure
+        $socialsPreference = [];
+        if (is_array($user->socials_preference)) {
+            foreach ($user->socials_preference as $social) {
+                $socialsPreference[] = [
+                    'name' => $social,
+                    'visible' => true
+                ];
+            }
+        }
+
+        // Create userPrimaryProfile (main user data)
+        $userPrimaryProfile = [
+            'id' => $user->id,
+            'firstName' => $user->first_name,
+            'lastName' => $user->last_name,
+            'email' => $user->email,
+            'avatar' => $user->avatar ?? '',
+            'phone' => $user->phone ?? '',
+            'website' => $user->website ?? '',
+            'location' => $user->location ?? '',
+            'companyName' => $user->company_name ?? '',
+            'socials' => is_array($user->social_links) ? implode(',', $user->social_links) : ($user->social_links ?? ''),
+            'bio' => $user->bio ?? '',
+            'position' => $user->position ?? '',
+            'industries' => $user->industries ?? [],
+            'isPrimaryProfile' => true,
+            'socialsPreference' => $socialsPreference
+        ];
+
+        // Create userSecondaryProfile (secondary profiles)
+        $userSecondaryProfile = [];
+        foreach ($user->userProfiles as $profile) {
+            $userSecondaryProfile[] = [
+                'id' => $profile->id,
+                'firstName' => $profile->first_name,
+                'lastName' => $profile->last_name,
+                'email' => $profile->email,
+                'avatar' => $profile->avatar ?? '',
+                'phone' => $profile->phone ?? '',
+                'website' => $profile->website ?? '',
+                'location' => $profile->location ?? '',
+                'companyName' => $profile->company_name ?? '',
+                'socials' => is_array($profile->social_links) ? implode(',', $profile->social_links) : ($profile->social_links ?? ''),
+                'bio' => $profile->bio ?? '',
+                'position' => $profile->position ?? '',
+                'industries' => $profile->industries ?? [],
+                'isPrimaryProfile' => false,
+                'socialsPreference' => $socialsPreference
+            ];
+        }
+
         return response()->json([
-            'message' => 'Success',
-            'user' => $user
+            'statusCode' => 200,
+            'message' => 'success',
+            'data' => [
+                'user' => [
+                    'userPrimaryProfile' => $userPrimaryProfile,
+                    'userSecondaryProfile' => $userSecondaryProfile
+                ]
+            ]
         ]);
     }
 
@@ -538,7 +597,11 @@ class UserController extends Controller
                 ];
             }
 
-            return response()->json($resultArray);
+            return response()->json([
+                'statusCode' => 200,
+                'message' => 'Success',
+                'data' => $resultArray
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Invalid JSON in file'

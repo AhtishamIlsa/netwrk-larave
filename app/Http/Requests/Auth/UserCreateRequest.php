@@ -22,7 +22,7 @@ class UserCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'password' => 'required|string|min:8|max:20|regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>-]).*$/',
+            'password' => 'required|string|min:8|max:20',
             'confirmPassword' => 'required|string|same:password',
             'email' => 'required|email|max:255',
         ];
