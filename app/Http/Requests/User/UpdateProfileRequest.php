@@ -25,13 +25,14 @@ class UpdateProfileRequest extends FormRequest
             'firstName' => 'nullable|string|max:255',
             'lastName' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:50',
-            'company_name' => 'nullable|string|max:255',
+            'companyName' => 'nullable|string|max:255',
             'position' => 'nullable|string|max:255',
             'location' => 'nullable|string',
+            'city' => 'nullable|string|max:255',
             'bio' => 'nullable|string',
             'industries' => 'nullable|array',
-            'socials' => 'nullable|array',
-            'city' => 'nullable|string|max:255',
+            'socials' => 'nullable',
+            'website' => 'nullable|string|url',
             'avatar' => 'nullable|string|url',
         ];
     }

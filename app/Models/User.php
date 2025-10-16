@@ -76,6 +76,14 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
+     * Get the contacts for the user.
+     */
+    public function contacts()
+    {
+        return $this->hasMany(Contact::class);
+    }
+
+    /**
      * Get the user's full name.
      */
     public function getFullNameAttribute()

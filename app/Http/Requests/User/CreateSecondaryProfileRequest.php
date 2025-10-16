@@ -28,7 +28,13 @@ class CreateSecondaryProfileRequest extends FormRequest
             'avatar' => 'nullable|string|url',
             'phone' => 'nullable|string|max:50',
             'website' => 'nullable|string|url',
-            'socials' => 'nullable|array',
+            'location' => 'nullable|string',
+            'city' => 'nullable|string|max:255',
+            'socials' => 'nullable',
+            'position' => 'nullable|string|max:255',
+            'companyName' => 'nullable|string|max:255',
+            'industries' => 'nullable|array',
+            'bio' => 'nullable|string',
         ];
     }
 

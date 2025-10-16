@@ -148,16 +148,51 @@ class AuthController extends Controller
             ], 400);
         }
 
-        // For testing purposes, accept any 4-digit OTP
-        // In production, you should implement proper OTP validation
-        $email = 'ahtisham.ullhaq@ilsainteractive.com.pk'; // Default email for testing
+        // Look up which email this OTP belongs to
+        $email = Cache::get("otp_lookup_{$request->otp}");
         
-        // Store verified OTP data for password creation
+        if (!$email) {
+            return response()->json([
+                'statusCode' => 400,
+                'message' => 'Invalid or expired OTP',
+                'data' => null
+            ], 400);
+        }
+
+        // Get the stored OTP and user data
+        $signupData = Cache::get("signup_otp_{$email}");
+        
+        if (!$signupData) {
+            return response()->json([
+                'statusCode' => 400,
+                'message' => 'Invalid or expired OTP',
+                'data' => null
+            ], 400);
+        }
+
+        // Verify the OTP matches
+        if ($signupData['otp'] !== $request->otp) {
+            return response()->json([
+                'statusCode' => 400,
+                'message' => 'Invalid OTP',
+                'data' => null
+            ], 400);
+        }
+
+        // Store verified signup data for user creation
         Cache::put("verified_signup_{$email}", [
             'email' => $email,
-            'firstName' => 'Ahtisham',
-            'lastName' => 'Ullhaq'
+            'firstName' => $signupData['user_data']['firstName'] ?? '',
+            'lastName' => $signupData['user_data']['lastName'] ?? '',
+            'avatar' => $signupData['user_data']['avatar'] ?? null,
+            'phone' => $signupData['user_data']['phone'] ?? null,
+            'website' => $signupData['user_data']['website'] ?? null,
+            'socials' => $signupData['user_data']['socials'] ?? [],
         ], 600);
+
+        // Clean up the OTP from cache (optional - prevents reuse)
+        Cache::forget("signup_otp_{$email}");
+        Cache::forget("otp_lookup_{$request->otp}");
 
         return response()->json([
             'statusCode' => 200,
@@ -309,6 +344,7 @@ class AuthController extends Controller
             'website' => $userData['website'] ?? null,
             'social_links' => $userData['socials'] ?? [],
             'otp_verified' => true,
+            'email_verified_at' => now(), // Set email as verified since OTP was confirmed
         ]);
 
         // Clear cache
@@ -397,7 +433,17 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request): JsonResponse
     {
+        // First, try to find user by primary email
         $user = User::where('email', $request->email)->first();
+
+        // If not found in primary users, check secondary profiles
+        if (!$user) {
+            $profile = UserProfile::where('email', $request->email)->first();
+            if ($profile) {
+                // Get the parent user for this secondary profile
+                $user = $profile->user;
+            }
+        }
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([

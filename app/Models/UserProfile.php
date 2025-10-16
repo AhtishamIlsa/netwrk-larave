@@ -23,11 +23,13 @@ class UserProfile extends Model
         'phone',
         'website',
         'location',
+        'city',
         'avatar',
         'social_links',
         'position',
         'company_name',
         'industries',
+        'bio',
     ];
 
     /**

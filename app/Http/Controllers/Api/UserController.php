@@ -8,6 +8,7 @@ use App\Http\Requests\User\CreateSecondaryProfileRequest;
 use App\Http\Requests\User\UpdateSocialsPreferencesRequest;
 use App\Http\Requests\User\DeleteUsersRequest;
 use App\Http\Requests\User\GetUserDashboardLocationRequest;
+use App\Models\Contact;
 use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
@@ -194,11 +195,14 @@ class UserController extends Controller
     {
         $user = $request->user();
         
+        // Check if updating secondary profile
+        $secondaryUserId = $request->query('secondaryUserId');
+        
         $updateData = [];
         if ($request->has('firstName')) $updateData['first_name'] = $request->firstName;
         if ($request->has('lastName')) $updateData['last_name'] = $request->lastName;
         if ($request->has('phone')) $updateData['phone'] = $request->phone;
-        if ($request->has('company_name')) $updateData['company_name'] = $request->company_name;
+        if ($request->has('companyName')) $updateData['company_name'] = $request->companyName;
         if ($request->has('position')) $updateData['position'] = $request->position;
         if ($request->has('location')) $updateData['location'] = $request->location;
         if ($request->has('bio')) $updateData['bio'] = $request->bio;
@@ -206,7 +210,22 @@ class UserController extends Controller
         if ($request->has('socials')) $updateData['social_links'] = $request->socials;
         if ($request->has('city')) $updateData['city'] = $request->city;
         if ($request->has('avatar')) $updateData['avatar'] = $request->avatar;
+        if ($request->has('website')) $updateData['website'] = $request->website;
 
+        // Update secondary profile if secondaryUserId provided
+        if ($secondaryUserId) {
+            $profile = UserProfile::where('id', $secondaryUserId)
+                                 ->where('user_id', $user->id)
+                                 ->firstOrFail();
+            $profile->update($updateData);
+            
+            return response()->json([
+                'message' => 'Success',
+                'user' => $profile
+            ]);
+        }
+
+        // Update primary user profile
         $user->update($updateData);
 
         return response()->json([
@@ -275,7 +294,13 @@ class UserController extends Controller
             'avatar' => $request->avatar,
             'phone' => $request->phone,
             'website' => $request->website,
-            'social_links' => $request->socials,
+            'location' => $request->location ?? null,
+            'city' => $request->city ?? null,
+            'social_links' => $request->socials ?? [],
+            'position' => $request->position ?? null,
+            'company_name' => $request->companyName ?? null,
+            'industries' => $request->industries ?? [],
+            'bio' => $request->bio ?? null,
         ]);
 
         return response()->json([
@@ -371,6 +396,36 @@ class UserController extends Controller
             }
         }
 
+        // Helper function to normalize socials
+        $normalizeSocials = function($socialLinks) {
+            $defaultSocials = [
+                'instagram' => '',
+                'linkedin' => '',
+                'youtube' => '',
+                'snapchat' => '',
+                'facebook' => '',
+                'tiktok' => '',
+                'x' => ''
+            ];
+
+            if (empty($socialLinks) || !is_array($socialLinks)) {
+                return $defaultSocials;
+            }
+
+            // Filter out non-social keys (like numeric indices) and null values
+            $filtered = array_filter($socialLinks, function($key) {
+                return in_array($key, ['instagram', 'linkedin', 'youtube', 'snapchat', 'facebook', 'tiktok', 'x']);
+            }, ARRAY_FILTER_USE_KEY);
+
+            // Merge with defaults and convert nulls to empty strings
+            $result = array_merge($defaultSocials, $filtered);
+            foreach ($result as $key => $value) {
+                $result[$key] = $value ?? '';
+            }
+
+            return $result;
+        };
+
         // Create userPrimaryProfile (main user data)
         $userPrimaryProfile = [
             'id' => $user->id,
@@ -381,8 +436,9 @@ class UserController extends Controller
             'phone' => $user->phone ?? '',
             'website' => $user->website ?? '',
             'location' => $user->location ?? '',
+            'city' => $user->city ?? '',
             'companyName' => $user->company_name ?? '',
-            'socials' => is_array($user->social_links) ? implode(',', $user->social_links) : ($user->social_links ?? ''),
+            'socials' => $normalizeSocials($user->social_links),
             'bio' => $user->bio ?? '',
             'position' => $user->position ?? '',
             'industries' => $user->industries ?? [],
@@ -402,8 +458,9 @@ class UserController extends Controller
                 'phone' => $profile->phone ?? '',
                 'website' => $profile->website ?? '',
                 'location' => $profile->location ?? '',
+                'city' => $profile->city ?? '',
                 'companyName' => $profile->company_name ?? '',
-                'socials' => is_array($profile->social_links) ? implode(',', $profile->social_links) : ($profile->social_links ?? ''),
+                'socials' => $normalizeSocials($profile->social_links),
                 'bio' => $profile->bio ?? '',
                 'position' => $profile->position ?? '',
                 'industries' => $profile->industries ?? [],
@@ -457,10 +514,12 @@ class UserController extends Controller
     {
         $userId = $request->user()->id;
         
-        // TODO: Implement actual dashboard data queries
-        // This would typically query contacts, referrals, groups tables
+        // Get actual counts from database
+        $contactsCount = Contact::where('user_id', $userId)->count();
+        
+        // TODO: Implement referrals and groups counts when those modules are ready
         $data = [
-            'contactsCount' => 0,
+            'contactsCount' => $contactsCount,
             'sentReferralsCount' => 0,
             'receivedReferralsCount' => 0,
             'groupsCreatedCount' => 0,
@@ -523,15 +582,113 @@ class UserController extends Controller
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 10);
         
-        // TODO: Implement location graph data queries
-        // This would typically query contacts and group by location/city
-        $cityData = [];
+        // Get map bounds
+        $swLat = $request->get('swLat');
+        $swLng = $request->get('swLng');
+        $neLat = $request->get('neLat');
+        $neLng = $request->get('neLng');
+        
+        // Optional filters
+        $industries = $request->get('industries');
+        $tags = $request->get('tags');
+        $searchCity = $request->get('city'); // Get city from search if provided
+        
+        // Build query for contacts within bounds OR matching city
+        $query = Contact::where('user_id', $userId)
+            ->where(function($q) use ($swLat, $swLng, $neLat, $neLng, $searchCity) {
+                // Either has coordinates within bounds
+                $q->where(function($sq) use ($swLat, $swLng, $neLat, $neLng) {
+                    $sq->whereNotNull('latitude')
+                       ->whereNotNull('longitude')
+                       ->where('latitude', '>', $swLat)
+                       ->where('latitude', '<', $neLat)
+                       ->where('longitude', '>', $swLng)
+                       ->where('longitude', '<', $neLng);
+                })
+                // OR has city name (for contacts without exact coordinates)
+                ->orWhereNotNull('city');
+            });
+        
+        // Apply industry filter if provided
+        if ($industries) {
+            $query->where('industries', 'like', '%' . $industries . '%');
+        }
+        
+        // Apply tags filter if provided
+        if ($tags) {
+            $query->whereJsonContains('tags', $tags);
+        }
+        
+        // Get total count
+        $totalRecords = $query->count();
+        
+        // Get paginated contacts
+        $paginatedContacts = $query
+            ->select('id', 'first_name', 'last_name', 'email', 'latitude', 'longitude', 'city')
+            ->skip(($page - 1) * $limit)
+            ->take($limit)
+            ->get()
+            ->map(function($contact) {
+                return [
+                    'id' => $contact->id,
+                    'firstName' => ucwords($contact->first_name),
+                    'lastName' => ucwords($contact->last_name),
+                    'email' => $contact->email,
+                    'latitude' => $contact->latitude,
+                    'longitude' => $contact->longitude,
+                ];
+            });
+        
+        // Group by city and count for cityData
+        $cityDataQuery = Contact::where('user_id', $userId)
+            ->whereNotNull('city')
+            ->where(function($q) use ($swLat, $swLng, $neLat, $neLng) {
+                // Either has coordinates within bounds
+                $q->where(function($sq) use ($swLat, $swLng, $neLat, $neLng) {
+                    $sq->whereNotNull('latitude')
+                       ->whereNotNull('longitude')
+                       ->where('latitude', '>', $swLat)
+                       ->where('latitude', '<', $neLat)
+                       ->where('longitude', '>', $swLng)
+                       ->where('longitude', '<', $neLng);
+                })
+                // OR just has a city (will use default city coordinates)
+                ->orWhereNull('latitude');
+            });
+        
+        // Apply same filters to cityData
+        if ($industries) {
+            $cityDataQuery->where('industries', 'like', '%' . $industries . '%');
+        }
+        if ($tags) {
+            $cityDataQuery->whereJsonContains('tags', $tags);
+        }
+        
+        // Get city data with coordinates (use first available coordinates for each city)
+        // Only include cities that have valid coordinates for map display
+        $cityData = $cityDataQuery
+            ->selectRaw('city, COUNT(*) as count, MAX(latitude) as lat, MAX(longitude) as lng')
+            ->groupBy('city')
+            ->havingRaw('MAX(latitude) IS NOT NULL AND MAX(longitude) IS NOT NULL')
+            ->get()
+            ->map(function($item) {
+                return [
+                    'city' => $item->city,
+                    'lat' => (float) $item->lat,
+                    'lng' => (float) $item->lng,
+                    'count' => $item->count,
+                ];
+            })
+            ->toArray();
+        
+        $totalPages = $totalRecords > 0 ? ceil($totalRecords / $limit) : 0;
+        
         $contacts = [
-            'paginatedData' => [],
-            'totalRecords' => 0,
-            'page' => $page,
-            'limit' => $limit,
-            'totalPages' => 0,
+            'paginatedData' => $paginatedContacts,
+            'totalRecords' => $totalRecords,
+            'page' => (int) $page,
+            'limit' => (int) $limit,
+            'totalPages' => $totalPages,
         ];
 
         $data = [

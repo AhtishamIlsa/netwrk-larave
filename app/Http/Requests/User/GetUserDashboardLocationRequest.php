@@ -22,6 +22,13 @@ class GetUserDashboardLocationRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'swLat' => 'required|numeric',
+            'swLng' => 'required|numeric',
+            'neLat' => 'required|numeric',
+            'neLng' => 'required|numeric',
+            'city' => 'nullable|string|max:255',
+            'industries' => 'nullable|string',
+            'tags' => 'nullable|string',
             'page' => 'nullable|integer|min:1',
             'limit' => 'nullable|integer|min:1|max:100',
         ];
@@ -33,6 +40,14 @@ class GetUserDashboardLocationRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'swLat.required' => 'South-West latitude is required',
+            'swLat.numeric' => 'South-West latitude must be a number',
+            'swLng.required' => 'South-West longitude is required',
+            'swLng.numeric' => 'South-West longitude must be a number',
+            'neLat.required' => 'North-East latitude is required',
+            'neLat.numeric' => 'North-East latitude must be a number',
+            'neLng.required' => 'North-East longitude is required',
+            'neLng.numeric' => 'North-East longitude must be a number',
             'page.integer' => 'Page must be an integer',
             'page.min' => 'Page must be at least 1',
             'limit.integer' => 'Limit must be an integer',

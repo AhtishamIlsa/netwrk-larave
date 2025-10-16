@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ContactsController;
+use App\Http\Controllers\Api\GroupsController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -47,5 +49,28 @@ Route::prefix('users')->group(function () {
     Route::get('/dashboard', [UserController::class, 'dashboard'])->middleware('auth:api');
     Route::get('/dashboard/graph/location', [UserController::class, 'getUserLocationGraph'])->middleware('auth:api');
     Route::get('/industries', [UserController::class, 'getIndustries']);
+});
+
+// Contacts Routes (matching NestJS structure)
+Route::prefix('contacts')->middleware('auth:api')->group(function () {
+    // List and search contacts
+    Route::get('/', [ContactsController::class, 'getContacts']);
+    
+    // Analytics and stats
+    Route::get('/indirect-contacts', [ContactsController::class, 'getIndirectContacts']);
+    Route::get('/graph/{year}', [ContactsController::class, 'getContactsChartData']);
+    
+    // CRUD operations
+    Route::post('/create-contact', [ContactsController::class, 'createContact']);
+    Route::get('/get-contact/{contactId}', [ContactsController::class, 'getSingleContact']);
+    Route::patch('/update-contact/{contactId}', [ContactsController::class, 'updateContact']);
+    Route::post('/delete', [ContactsController::class, 'deleteContacts']);
+});
+
+// Groups Routes (matching NestJS structure)
+Route::prefix('groups')->middleware('auth:api')->group(function () {
+    Route::get('/find-users-groups', [GroupsController::class, 'findUsersGroups']);
+    Route::get('/group-list', [GroupsController::class, 'getGroupsList']);
+    Route::post('/create-group', [GroupsController::class, 'createGroup']);
 });
 
