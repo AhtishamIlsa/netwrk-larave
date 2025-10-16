@@ -30,6 +30,8 @@ class CreateSecondaryProfileRequest extends FormRequest
             'website' => 'nullable|string|url',
             'location' => 'nullable|string',
             'city' => 'nullable|string|max:255',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'socials' => 'nullable',
             'position' => 'nullable|string|max:255',
             'companyName' => 'nullable|string|max:255',

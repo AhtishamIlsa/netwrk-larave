@@ -29,6 +29,8 @@ class UpdateProfileRequest extends FormRequest
             'position' => 'nullable|string|max:255',
             'location' => 'nullable|string',
             'city' => 'nullable|string|max:255',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'bio' => 'nullable|string',
             'industries' => 'nullable|array',
             'socials' => 'nullable',

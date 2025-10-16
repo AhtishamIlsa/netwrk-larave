@@ -11,6 +11,7 @@ use App\Http\Requests\User\GetUserDashboardLocationRequest;
 use App\Models\Contact;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Services\GeocodingService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -25,6 +26,12 @@ use Illuminate\Support\Facades\File;
  */
 class UserController extends Controller
 {
+    protected $geocodingService;
+
+    public function __construct(GeocodingService $geocodingService)
+    {
+        $this->geocodingService = $geocodingService;
+    }
     /**
      * @OA\Get(
      *     path="/api/users/graph/contact-industry",
@@ -211,12 +218,40 @@ class UserController extends Controller
         if ($request->has('city')) $updateData['city'] = $request->city;
         if ($request->has('avatar')) $updateData['avatar'] = $request->avatar;
         if ($request->has('website')) $updateData['website'] = $request->website;
+        if ($request->has('latitude')) $updateData['latitude'] = $request->latitude;
+        if ($request->has('longitude')) $updateData['longitude'] = $request->longitude;
+
+        // Auto-geocode if city is provided but no valid coordinates
+        if (isset($updateData['city'])) {
+            // Get current or new coordinates
+            if ($secondaryUserId) {
+                $profile = UserProfile::where('id', $secondaryUserId)
+                    ->where('user_id', $user->id)
+                    ->firstOrFail();
+                $currentLat = isset($updateData['latitude']) ? $updateData['latitude'] : $profile->latitude;
+                $currentLng = isset($updateData['longitude']) ? $updateData['longitude'] : $profile->longitude;
+            } else {
+                $currentLat = isset($updateData['latitude']) ? $updateData['latitude'] : $user->latitude;
+                $currentLng = isset($updateData['longitude']) ? $updateData['longitude'] : $user->longitude;
+            }
+            
+            // Only geocode if we don't have valid coordinates
+            if (!$this->geocodingService->hasValidCoordinates($currentLat, $currentLng)) {
+                $geocodeResult = $this->geocodingService->geocode($updateData['city']);
+                if ($geocodeResult) {
+                    $updateData['latitude'] = $geocodeResult['latitude'];
+                    $updateData['longitude'] = $geocodeResult['longitude'];
+                }
+            }
+        }
 
         // Update secondary profile if secondaryUserId provided
         if ($secondaryUserId) {
-            $profile = UserProfile::where('id', $secondaryUserId)
-                                 ->where('user_id', $user->id)
-                                 ->firstOrFail();
+            if (!isset($profile)) {
+                $profile = UserProfile::where('id', $secondaryUserId)
+                    ->where('user_id', $user->id)
+                    ->firstOrFail();
+            }
             $profile->update($updateData);
             
             return response()->json([
@@ -287,6 +322,18 @@ class UserController extends Controller
             ], 422);
         }
 
+        // Auto-geocode if city provided but no coordinates
+        $latitude = $request->latitude ?? null;
+        $longitude = $request->longitude ?? null;
+        
+        if (!empty($request->city) && !$this->geocodingService->hasValidCoordinates($latitude, $longitude)) {
+            $geocodeResult = $this->geocodingService->geocode($request->city);
+            if ($geocodeResult) {
+                $latitude = $geocodeResult['latitude'];
+                $longitude = $geocodeResult['longitude'];
+            }
+        }
+
         $profile = $user->userProfiles()->create([
             'email' => $request->email,
             'first_name' => $request->firstName,
@@ -296,6 +343,8 @@ class UserController extends Controller
             'website' => $request->website,
             'location' => $request->location ?? null,
             'city' => $request->city ?? null,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
             'social_links' => $request->socials ?? [],
             'position' => $request->position ?? null,
             'company_name' => $request->companyName ?? null,
@@ -593,21 +642,14 @@ class UserController extends Controller
         $tags = $request->get('tags');
         $searchCity = $request->get('city'); // Get city from search if provided
         
-        // Build query for contacts within bounds OR matching city
+        // Build query for contacts strictly within bounds (must have valid coords)
         $query = Contact::where('user_id', $userId)
-            ->where(function($q) use ($swLat, $swLng, $neLat, $neLng, $searchCity) {
-                // Either has coordinates within bounds
-                $q->where(function($sq) use ($swLat, $swLng, $neLat, $neLng) {
-                    $sq->whereNotNull('latitude')
-                       ->whereNotNull('longitude')
-                       ->where('latitude', '>', $swLat)
-                       ->where('latitude', '<', $neLat)
-                       ->where('longitude', '>', $swLng)
-                       ->where('longitude', '<', $neLng);
-                })
-                // OR has city name (for contacts without exact coordinates)
-                ->orWhereNotNull('city');
-            });
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->where('latitude', '>', $swLat)
+            ->where('latitude', '<', $neLat)
+            ->where('longitude', '>', $swLng)
+            ->where('longitude', '<', $neLng);
         
         // Apply industry filter if provided
         if ($industries) {
@@ -639,22 +681,15 @@ class UserController extends Controller
                 ];
             });
         
-        // Group by city and count for cityData
+        // Group by city and count for cityData (only contacts within bounds with valid coords)
         $cityDataQuery = Contact::where('user_id', $userId)
             ->whereNotNull('city')
-            ->where(function($q) use ($swLat, $swLng, $neLat, $neLng) {
-                // Either has coordinates within bounds
-                $q->where(function($sq) use ($swLat, $swLng, $neLat, $neLng) {
-                    $sq->whereNotNull('latitude')
-                       ->whereNotNull('longitude')
-                       ->where('latitude', '>', $swLat)
-                       ->where('latitude', '<', $neLat)
-                       ->where('longitude', '>', $swLng)
-                       ->where('longitude', '<', $neLng);
-                })
-                // OR just has a city (will use default city coordinates)
-                ->orWhereNull('latitude');
-            });
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->where('latitude', '>', $swLat)
+            ->where('latitude', '<', $neLat)
+            ->where('longitude', '>', $swLng)
+            ->where('longitude', '<', $neLng);
         
         // Apply same filters to cityData
         if ($industries) {
@@ -681,14 +716,9 @@ class UserController extends Controller
             })
             ->toArray();
         
-        $totalPages = $totalRecords > 0 ? ceil($totalRecords / $limit) : 0;
-        
         $contacts = [
-            'paginatedData' => $paginatedContacts,
             'totalRecords' => $totalRecords,
-            'page' => (int) $page,
-            'limit' => (int) $limit,
-            'totalPages' => $totalPages,
+            'paginatedData' => $paginatedContacts,
         ];
 
         $data = [
