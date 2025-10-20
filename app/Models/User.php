@@ -34,6 +34,8 @@ class User extends Authenticatable implements JWTSubject
         'social_links',
         'socials_preference',
         'city',
+        'latitude',
+        'longitude',
         'is_deleted',
         'otp_verified',
         'role',
@@ -62,6 +64,8 @@ class User extends Authenticatable implements JWTSubject
             'industries' => 'array',
             'social_links' => 'array',
             'socials_preference' => 'array',
+            'latitude' => 'decimal:8',
+            'longitude' => 'decimal:8',
             'is_deleted' => 'boolean',
             'otp_verified' => 'boolean',
         ];

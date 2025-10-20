@@ -6,7 +6,9 @@ use App\Http\Controllers\Api\CitiesController;
 use App\Http\Controllers\Api\ContactsController;
 use App\Http\Controllers\Api\GroupsController;
 use App\Http\Controllers\Api\UploadController;
+use App\Http\Controllers\Api\MakeAnIntroController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ReferralsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -77,6 +79,22 @@ Route::prefix('groups')->middleware('auth:api')->group(function () {
     Route::get('/find-users-groups', [GroupsController::class, 'findUsersGroups']);
     Route::get('/group-list', [GroupsController::class, 'getGroupsList']);
     Route::post('/create-group', [GroupsController::class, 'createGroup']);
+});
+
+// Referrals Routes (matching NestJS structure)
+Route::prefix('referrals')->middleware('auth:api')->group(function () {
+    Route::get('/get-user-referrals', [ReferralsController::class, 'getUserReferrals']);
+    Route::post('/update-status/{introductionId}', [ReferralsController::class, 'updateStatus']);
+    Route::post('/update-request-status/{introductionId}', [ReferralsController::class, 'updateRequestStatus']);
+    Route::get('/get-detail/{introductionId}', [ReferralsController::class, 'getDetail']);
+    Route::post('/send-reminder/{introductionId}', [ReferralsController::class, 'sendReminder']);
+    Route::post('/revoke-referral/{introductionId}', [ReferralsController::class, 'revokeReferral']);
+});
+
+// Make An Intro Routes (matching NestJS structure)
+Route::prefix('make-an-intro')->middleware('auth:api')->group(function () {
+    Route::post('/validation', [MakeAnIntroController::class, 'validation']);
+    Route::post('/', [MakeAnIntroController::class, 'create']);
 });
 
 // Upload Routes (matching NestJS structure)

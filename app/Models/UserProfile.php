@@ -24,6 +24,8 @@ class UserProfile extends Model
         'website',
         'location',
         'city',
+        'latitude',
+        'longitude',
         'avatar',
         'social_links',
         'position',
@@ -42,6 +44,8 @@ class UserProfile extends Model
         return [
             'social_links' => 'array',
             'industries' => 'array',
+            'latitude' => 'decimal:8',
+            'longitude' => 'decimal:8',
         ];
     }
 
