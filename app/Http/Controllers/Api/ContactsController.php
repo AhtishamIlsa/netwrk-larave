@@ -637,6 +637,236 @@ class ContactsController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/contacts/import-csv",
+     *     summary="Import contacts from CSV",
+     *     tags={"contacts"},
+     *     security={{"sanctum":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(
+     *                     property="file",
+     *                     type="string",
+     *                     format="binary",
+     *                     description="CSV file to import"
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="CSV imported",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="message", type="string", example="Import completed"),
+     *             @OA\Property(property="totalRecords", type="integer", example=42),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="summary", type="object",
+     *                     @OA\Property(property="totalRows", type="integer", example=10),
+     *                     @OA\Property(property="created", type="integer", example=8),
+     *                     @OA\Property(property="skipped", type="integer", example=2)
+     *                 ),
+     *                 @OA\Property(property="results", type="array", @OA\Items(type="object"))
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function importCsv(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|file|mimes:csv,txt|max:20480', // 20MB
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'statusCode' => 422,
+                'message' => 'Validation failed',
+                'data' => [
+                    'errors' => $validator->errors()
+                ]
+            ], 422);
+        }
+
+        $userId = $request->user()->id;
+        $file = $request->file('file');
+
+        $handle = fopen($file->getRealPath(), 'r');
+        if ($handle === false) {
+            return response()->json([
+                'statusCode' => 400,
+                'message' => 'Unable to read uploaded file',
+                'data' => null
+            ], 400);
+        }
+
+        $header = null;
+        $rows = [];
+        while (($data = fgetcsv($handle)) !== false) {
+            if ($header === null) {
+                $header = array_map(function($h) { return strtolower(trim($h)); }, $data);
+                continue;
+            }
+            // Build associative row by header
+            $row = [];
+            foreach ($data as $i => $value) {
+                $key = $header[$i] ?? 'col_' . $i;
+                $row[$key] = $value;
+            }
+            $rows[] = $row;
+        }
+        fclose($handle);
+
+        $results = [];
+        $created = 0;
+        $skipped = 0;
+        $totalRecords = Contact::where('user_id', $userId)->count();
+
+        foreach ($rows as $row) {
+            // Map flexible headers to expected API keys
+            $mapped = [
+                'firstName' => $row['firstname'] ?? $row['first_name'] ?? $row['first'] ?? null,
+                'lastName' => $row['lastname'] ?? $row['last_name'] ?? $row['last'] ?? null,
+                'email' => $row['email'] ?? null,
+                'position' => $row['position'] ?? null,
+                'company' => $row['company'] ?? $row['company_name'] ?? null,
+                'phone' => $row['phone'] ?? null,
+                'workPhone' => $row['workphone'] ?? $row['work_phone'] ?? null,
+                'homePhone' => $row['homephone'] ?? $row['home_phone'] ?? null,
+                'address' => $row['address'] ?? null,
+                'additionalAddresses' => $row['additionaladdresses'] ?? $row['additional_addresses'] ?? null,
+                'city' => $row['city'] ?? null,
+                'latitude' => $row['latitude'] ?? null,
+                'longitude' => $row['longitude'] ?? null,
+                'timezone' => $row['timezone'] ?? null,
+                'birthday' => $row['birthday'] ?? null,
+                'notes' => $row['notes'] ?? null,
+                'title' => $row['title'] ?? null,
+                'role' => $row['role'] ?? null,
+                'websiteUrl' => $row['websiteurl'] ?? $row['website_url'] ?? null,
+                // optional hints for geocoding
+                'state' => $row['state'] ?? $row['state_code'] ?? $row['province'] ?? null,
+                'country' => $row['country'] ?? $row['country_code'] ?? null,
+            ];
+
+            // tags and industries could be semicolon/comma separated
+            if (!empty($row['tags'])) {
+                $mapped['tags'] = array_values(array_filter(array_map('trim', preg_split('/[;,]/', (string)$row['tags']))));
+            }
+            if (!empty($row['industries'])) {
+                $mapped['industries'] = array_values(array_filter(array_map('trim', preg_split('/[;,]/', (string)$row['industries']))));
+            }
+            // socials may be JSON string
+            if (!empty($row['socials'])) {
+                $decoded = json_decode((string)$row['socials'], true);
+                if (is_array($decoded)) {
+                    $mapped['socials'] = $decoded;
+                }
+            }
+
+            // Basic validation
+            if (empty($mapped['firstName']) || empty($mapped['lastName'])) {
+                $results[] = [
+                    'success' => false,
+                    'message' => 'Missing firstName/lastName',
+                    'email' => $mapped['email'] ?? null,
+                ];
+                $skipped++;
+                continue;
+            }
+
+            // Duplication by email for this user
+            if (!empty($mapped['email'])) {
+                $exists = Contact::where('user_id', $userId)
+                    ->where('email', strtolower($mapped['email']))
+                    ->exists();
+                if ($exists) {
+                    $results[] = [
+                        'success' => false,
+                        'message' => 'Duplicate email',
+                        'email' => $mapped['email']
+                    ];
+                    $skipped++;
+                    continue;
+                }
+            }
+
+            // Normalize numeric fields: treat empty strings as null, cast when present
+            $normLat = $mapped['latitude'] ?? null;
+            if (is_string($normLat) && trim($normLat) === '') { $normLat = null; }
+            elseif (!is_null($normLat)) { $normLat = (float) $normLat; }
+
+            $normLng = $mapped['longitude'] ?? null;
+            if (is_string($normLng) && trim($normLng) === '') { $normLng = null; }
+            elseif (!is_null($normLng)) { $normLng = (float) $normLng; }
+
+            // If lat/lng still missing but city provided, try resolve from cities cache (and fallback via service)
+            if (!empty($mapped['city']) && !$this->geocodingService->hasValidCoordinates($normLat, $normLng)) {
+                $geo = $this->geocodingService->geocode($mapped['city'], $mapped['state'] ?? null, $mapped['country'] ?? null);
+                if ($geo && isset($geo['latitude'], $geo['longitude'])) {
+                    $normLat = (float) $geo['latitude'];
+                    $normLng = (float) $geo['longitude'];
+                }
+            }
+
+            $contact = Contact::create([
+                'user_id' => $userId,
+                'first_name' => strtolower(trim($mapped['firstName'])),
+                'last_name' => strtolower(trim($mapped['lastName'])),
+                'email' => isset($mapped['email']) ? strtolower(trim($mapped['email'])) : null,
+                'position' => $mapped['position'] ?? null,
+                'company_name' => $mapped['company'] ?? null,
+                'phone' => $mapped['phone'] ?? null,
+                'work_phone' => $mapped['workPhone'] ?? null,
+                'home_phone' => $mapped['homePhone'] ?? null,
+                'address' => $mapped['address'] ?? null,
+                'additional_addresses' => $mapped['additionalAddresses'] ?? null,
+                'city' => $mapped['city'] ?? null,
+                'latitude' => $normLat,
+                'longitude' => $normLng,
+                'timezone' => $mapped['timezone'] ?? null,
+                'birthday' => $mapped['birthday'] ?? null,
+                'notes' => $mapped['notes'] ?? null,
+                'tags' => $mapped['tags'] ?? [],
+                'industries' => $mapped['industries'] ?? [],
+                'socials' => $mapped['socials'] ?? [],
+                'title' => $mapped['title'] ?? null,
+                'role' => $mapped['role'] ?? null,
+                'website_url' => $mapped['websiteUrl'] ?? null,
+            ]);
+
+            $totalRecords++;
+            // Return concise per-row result
+            $results[] = [
+                'success' => true,
+                'id' => $contact->id,
+                'email' => $contact->email,
+                'city' => $contact->city,
+                'latitude' => $contact->latitude,
+                'longitude' => $contact->longitude,
+            ];
+            $created++;
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Import completed',
+            'totalRecords' => $totalRecords,
+            'data' => [
+                'summary' => [
+                    'totalRows' => count($rows),
+                    'created' => $created,
+                    'skipped' => $skipped,
+                ],
+                'results' => $results,
+            ]
+        ]);
+    }
+
+    /**
      * Format contact for API response
      */
     private function formatContact($contact): array
