@@ -315,6 +315,38 @@ class ContactsController extends Controller
         $totalRecords = Contact::where('user_id', $userId)->count();
 
         foreach ($contactsData as $contactData) {
+            // Normalize array fields to allow empty entries without failing validation
+            if (isset($contactData['tags'])) {
+                if (is_string($contactData['tags'])) {
+                    $decoded = json_decode($contactData['tags'], true);
+                    if (is_array($decoded)) {
+                        $contactData['tags'] = $decoded;
+                    } else {
+                        $contactData['tags'] = array_values(array_filter(array_map('trim', preg_split('/[;,]/', (string)$contactData['tags']))));
+                    }
+                }
+                if (is_array($contactData['tags'])) {
+                    $contactData['tags'] = array_values(array_filter(array_map(function ($v) {
+                        return is_string($v) ? trim($v) : '';
+                    }, $contactData['tags']), function ($v) { return $v !== ''; }));
+                }
+            }
+            if (isset($contactData['industries'])) {
+                if (is_string($contactData['industries'])) {
+                    $decoded = json_decode($contactData['industries'], true);
+                    if (is_array($decoded)) {
+                        $contactData['industries'] = $decoded;
+                    } else {
+                        $contactData['industries'] = array_values(array_filter(array_map('trim', preg_split('/[;,]/', (string)$contactData['industries']))));
+                    }
+                }
+                if (is_array($contactData['industries'])) {
+                    $contactData['industries'] = array_values(array_filter(array_map(function ($v) {
+                        return is_string($v) ? trim($v) : '';
+                    }, $contactData['industries']), function ($v) { return $v !== ''; }));
+                }
+            }
+
             $validator = Validator::make($contactData, [
                 'firstName' => 'required|string|max:255',
                 'lastName' => 'required|string|max:255',
@@ -332,8 +364,9 @@ class ContactsController extends Controller
                 'birthday' => 'nullable|string',
                 'notes' => 'nullable|string',
                 'tags' => 'nullable|array',
-                'tags.*' => 'string|max:50',
+                'tags.*' => 'nullable|string|max:50',
                 'industries' => 'nullable|array',
+                'industries.*' => 'nullable|string|max:50',
                 'socials' => 'nullable|array',
                 'title' => 'nullable|string|max:255',
                 'role' => 'nullable|string|max:255',
@@ -752,12 +785,38 @@ class ContactsController extends Controller
                 'country' => $row['country'] ?? $row['country_code'] ?? null,
             ];
 
-            // tags and industries could be semicolon/comma separated
-            if (!empty($row['tags'])) {
-                $mapped['tags'] = array_values(array_filter(array_map('trim', preg_split('/[;,]/', (string)$row['tags']))));
+            // tags and industries could be semicolon/comma separated or JSON arrays; allow empty strings safely
+            if (isset($row['tags'])) {
+                $t = $row['tags'];
+                if (is_string($t)) {
+                    $decoded = json_decode($t, true);
+                    if (is_array($decoded)) {
+                        $t = $decoded;
+                    } else {
+                        $t = preg_split('/[;,]/', (string)$t);
+                    }
+                }
+                if (is_array($t)) {
+                    $mapped['tags'] = array_values(array_filter(array_map(function ($v) {
+                        return is_string($v) ? trim($v) : '';
+                    }, $t), function ($v) { return $v !== ''; }));
+                }
             }
-            if (!empty($row['industries'])) {
-                $mapped['industries'] = array_values(array_filter(array_map('trim', preg_split('/[;,]/', (string)$row['industries']))));
+            if (isset($row['industries'])) {
+                $ind = $row['industries'];
+                if (is_string($ind)) {
+                    $decoded = json_decode($ind, true);
+                    if (is_array($decoded)) {
+                        $ind = $decoded;
+                    } else {
+                        $ind = preg_split('/[;,]/', (string)$ind);
+                    }
+                }
+                if (is_array($ind)) {
+                    $mapped['industries'] = array_values(array_filter(array_map(function ($v) {
+                        return is_string($v) ? trim($v) : '';
+                    }, $ind), function ($v) { return $v !== ''; }));
+                }
             }
             // socials may be JSON string
             if (!empty($row['socials'])) {
