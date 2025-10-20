@@ -50,21 +50,10 @@ class UploadController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=200,
+     *         response=201,
      *         description="File uploaded successfully",
      *         @OA\JsonContent(
-     *             @OA\Property(property="statusCode", type="integer", example=200),
-     *             @OA\Property(property="message", type="string", example="File uploaded successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(property="url", type="string", example="https://bucket.s3.amazonaws.com/uploads/file.jpg"),
-     *                 @OA\Property(property="path", type="string", example="uploads/uuid-filename.jpg"),
-     *                 @OA\Property(property="filename", type="string", example="uuid-filename.jpg"),
-     *                 @OA\Property(property="original_name", type="string", example="original-filename.jpg"),
-     *                 @OA\Property(property="size", type="integer", example=1024),
-     *                 @OA\Property(property="mime_type", type="string", example="image/jpeg")
-     *             )
+     *             @OA\Property(property="url", type="string", example="https://bucket.s3.amazonaws.com/uploads/file.jpg")
      *         )
      *     ),
      *     @OA\Response(
@@ -107,16 +96,13 @@ class UploadController extends Controller
             }
 
             $file = $request->file('file');
-            $folder = $request->input('folder', 'uploads');
+            // Always use 'uploads' folder like NestJS, ignore user input
+            $result = $this->s3Service->uploadFile($file, 'uploads');
 
-            // Upload file to S3
-            $result = $this->s3Service->uploadFile($file, $folder);
-
+            // Return Nest-style response: 201 with only { url }
             return response()->json([
-                'statusCode' => 200,
-                'message' => 'File uploaded successfully',
-                'data' => $result
-            ]);
+                'url' => $result['url'] ?? null,
+            ], 201);
 
         } catch (Exception $e) {
             return response()->json([

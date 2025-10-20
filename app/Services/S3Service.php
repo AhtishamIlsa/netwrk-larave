@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 use Exception;
@@ -19,9 +20,10 @@ class S3Service
     {
         $this->accessKey = config('filesystems.disks.s3.key');
         $this->secretKey = config('filesystems.disks.s3.secret');
-        $this->bucketName = config('filesystems.disks.s3.bucket');
+        $this->bucketName = 'netwrk-dev-staging-static-images-s3-bucket';
         $this->region = config('filesystems.disks.s3.region');
-        $this->endpoint = "https://{$this->bucketName}.s3.{$this->region}.amazonaws.com";
+        // Use the actual S3 bucket URL from your NestJS project
+        $this->endpoint = "https://netwrk-dev-staging-static-images-s3-bucket.s3.us-west-2.amazonaws.com";
     }
 
     /**
@@ -40,26 +42,37 @@ class S3Service
                 throw new Exception('Invalid file provided');
             }
 
-            // Generate unique filename
-            $extension = $file->getClientOriginalExtension();
-            $filename = Str::uuid() . '-' . time() . '.' . $extension;
-            $filePath = $folder . '/' . $filename;
+            // Generate filename like NestJS: UUID + original filename
+            $originalName = $file->getClientOriginalName();
+            $filename = Str::uuid() . '-' . $originalName;
+            $filePath = 'uploads/' . $filename; // Always use 'uploads' folder like NestJS
 
-            // For now, let's create a simple mock response since we can't install AWS SDK
-            // In production, you would implement actual S3 upload here
-            $url = "{$this->endpoint}/{$filePath}";
-
-            Log::info("Mock S3 Upload: {$filePath}");
-
-            return [
-                'success' => true,
-                'url' => $url,
-                'path' => $filePath,
-                'filename' => $filename,
-                'original_name' => $file->getClientOriginalName(),
-                'size' => $file->getSize(),
-                'mime_type' => $file->getMimeType(),
-            ];
+            // Proxy upload to NestJS API for real S3 upload
+            $nestApiUrl = 'https://api.staging.netwrk.vip/upload';
+            
+            $response = Http::attach('file', $file->getContent(), $file->getClientOriginalName())
+                ->post($nestApiUrl);
+            
+            if ($response->successful()) {
+                $data = $response->json();
+                $url = $data['url'] ?? null;
+                
+                if ($url) {
+                    Log::info("NestJS S3 Upload Success: {$url}");
+                    return [
+                        'success' => true,
+                        'url' => $url,
+                        'path' => $filePath,
+                        'filename' => $filename,
+                        'original_name' => $file->getClientOriginalName(),
+                        'size' => $file->getSize(),
+                        'mime_type' => $file->getMimeType(),
+                    ];
+                }
+            }
+            
+            Log::error("NestJS Upload Failed: " . $response->body());
+            throw new Exception('File upload failed: ' . $response->body());
 
         } catch (Exception $e) {
             Log::error('S3 Upload Error: ' . $e->getMessage());
