@@ -2,74 +2,125 @@
 
 namespace App\Services;
 
+use App\Models\City;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 
 class GeocodingService
 {
-    protected $apiKey;
-
-    public function __construct()
+    public function hasValidCoordinates($lat, $lng): bool
     {
-        $this->apiKey = Config::get('services.google.maps_api_key');
+        if ($lat === null || $lng === null) {
+            return false;
+        }
+        return is_numeric($lat) && is_numeric($lng);
     }
 
     /**
-     * Geocode an address/city to get latitude and longitude
-     *
-     * @param string $address
-     * @return array|null Returns ['latitude' => float, 'longitude' => float] or null
+     * Resolve coordinates from local cities cache only.
+     * Accepts city and optional state/country for better precision.
+     * Maintains BC with previous callers by allowing single argument.
      */
-    public function geocode(string $address): ?array
+    public function geocode(string $cityName, ?string $state = null, ?string $country = null): ?array
     {
-        if (empty($this->apiKey)) {
-            Log::warning('Google Maps API key is not configured');
+        $name = trim($cityName);
+        if ($name === '') {
             return null;
         }
 
-        try {
-            $response = Http::get('https://maps.googleapis.com/maps/api/geocode/json', [
-                'address' => $address,
-                'key' => $this->apiKey,
-            ]);
+        $query = City::query();
+        $query->whereRaw('LOWER(name) = ?', [strtolower($name)]);
+        if ($state !== null && $state !== '') {
+            $query->where(function ($q) use ($state) {
+                $q->whereRaw('LOWER(state) = ?', [strtolower($state)])
+                  ->orWhereNull('state');
+            });
+        }
+        if ($country !== null && $country !== '') {
+            $query->where(function ($q) use ($country) {
+                $q->whereRaw('LOWER(country) = ?', [strtolower($country)])
+                  ->orWhereNull('country');
+            });
+        }
 
-            $data = $response->json();
+        $city = $query->first();
+        if ($city && $this->hasValidCoordinates($city->latitude, $city->longitude)) {
+            return [
+                'latitude' => (float) $city->latitude,
+                'longitude' => (float) $city->longitude,
+                'timezone' => $city->timezone,
+            ];
+        }
 
-            if ($data['status'] === 'OK' && !empty($data['results'])) {
-                $location = $data['results'][0]['geometry']['location'];
-                
-                return [
-                    'latitude' => $location['lat'],
-                    'longitude' => $location['lng'],
-                ];
-            }
-
-            Log::info("Geocoding failed for address: {$address}", ['response' => $data]);
-            return null;
-        } catch (\Exception $e) {
-            Log::error('Geocoding error: ' . $e->getMessage(), [
-                'address' => $address,
-                'exception' => $e
-            ]);
+        // Fallback: Google Maps Geocoding
+        $apiKey = config('services.google.maps_api_key') ?? env('GOOGLE_MAPS_API_KEY');
+        if (!$apiKey) {
             return null;
         }
+
+        $addressParts = array_filter([$name, $state, $country]);
+        $params = [
+            'address' => implode(', ', $addressParts),
+            'key' => $apiKey,
+        ];
+
+        $response = Http::timeout(20)->get('https://maps.googleapis.com/maps/api/geocode/json', $params);
+        if (!$response->ok()) {
+            return null;
+        }
+        $body = $response->json();
+        if (($body['status'] ?? '') !== 'OK' || empty($body['results'][0]['geometry']['location'])) {
+            return null;
+        }
+        $loc = $body['results'][0]['geometry']['location'];
+        $lat = $loc['lat'] ?? null;
+        $lng = $loc['lng'] ?? null;
+        if (!$this->hasValidCoordinates($lat, $lng)) {
+            return null;
+        }
+
+        // Cache in cities table
+        $this->upsertCity($name, $state, $country, $lat, $lng, null);
+
+        return [
+            'latitude' => (float) $lat,
+            'longitude' => (float) $lng,
+            'timezone' => null,
+        ];
     }
 
     /**
-     * Check if coordinates are valid
-     *
-     * @param float|null $latitude
-     * @param float|null $longitude
-     * @return bool
+     * Upsert a city record when we already have coordinates (e.g., from import CSV).
      */
-    public function hasValidCoordinates(?float $latitude, ?float $longitude): bool
+    public function upsertCity(string $name, ?string $state, ?string $country, $latitude, $longitude, ?string $timezone = null): void
     {
-        return is_numeric($latitude) && 
-               is_numeric($longitude) && 
-               $latitude >= -90 && 
-               $latitude <= 90 && 
-               $longitude >= -180 && 
-               $longitude <= 180;
+        $name = trim($name);
+        if ($name === '' || !$this->hasValidCoordinates($latitude, $longitude)) {
+            return;
+        }
+
+        $existing = City::where('name', $name)
+            ->where('state', $state)
+            ->where('country', $country)
+            ->first();
+
+        if ($existing) {
+            $existing->update([
+                'latitude' => $latitude,
+                'longitude' => $longitude,
+                'timezone' => $timezone,
+            ]);
+            return;
+        }
+
+        City::create([
+            'name' => $name,
+            'state' => $state,
+            'country' => $country,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'timezone' => $timezone,
+        ]);
     }
 }

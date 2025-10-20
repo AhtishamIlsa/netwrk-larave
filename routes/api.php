@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CitiesController;
 use App\Http\Controllers\Api\ContactsController;
 use App\Http\Controllers\Api\GroupsController;
+use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\MakeAnIntroController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ReferralsController;
@@ -57,6 +60,8 @@ Route::prefix('users')->group(function () {
 Route::prefix('contacts')->middleware('auth:api')->group(function () {
     // List and search contacts
     Route::get('/', [ContactsController::class, 'getContacts']);
+    // Import CSV
+    Route::post('/import-csv', [ContactsController::class, 'importCsv']);
     
     // Analytics and stats
     Route::get('/indirect-contacts', [ContactsController::class, 'getIndirectContacts']);
@@ -90,5 +95,27 @@ Route::prefix('referrals')->middleware('auth:api')->group(function () {
 Route::prefix('make-an-intro')->middleware('auth:api')->group(function () {
     Route::post('/validation', [MakeAnIntroController::class, 'validation']);
     Route::post('/', [MakeAnIntroController::class, 'create']);
+});
+
+// Upload Routes (matching NestJS structure)
+Route::prefix('upload')->group(function () {
+    Route::post('/', [UploadController::class, 'upload']);
+    Route::post('/multiple', [UploadController::class, 'uploadMultiple']);
+    Route::delete('/delete', [UploadController::class, 'delete']);
+    Route::post('/presigned-url', [UploadController::class, 'generatePresignedUrl']);
+    Route::get('/file-info', [UploadController::class, 'getFileInfo']);
+});
+
+// Cities import and caching routes
+Route::prefix('cities')->group(function () {
+    Route::post('/import', [CitiesController::class, 'import']);
+});
+
+// Admin Routes (matching NestJS structure)
+Route::prefix('admins')->group(function () {
+    Route::get('/dashboard/stats', [AdminController::class, 'getDashboardStats']);
+    Route::get('/dashboard/topUsers', [AdminController::class, 'getTopUsers']);
+    Route::get('/dashboard/topGroups', [AdminController::class, 'getTopGroups']);
+    Route::get('/users', [AdminController::class, 'getAllUsers']);
 });
 
