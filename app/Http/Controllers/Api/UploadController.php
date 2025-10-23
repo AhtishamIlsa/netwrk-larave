@@ -26,7 +26,7 @@ class UploadController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/upload",
+     *     path="/upload",
      *     summary="Upload a file to S3",
      *     tags={"upload"},
      *     @OA\RequestBody(
@@ -115,7 +115,7 @@ class UploadController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/upload/multiple",
+     *     path="/upload/multiple",
      *     summary="Upload multiple files to S3",
      *     tags={"upload"},
      *     @OA\RequestBody(
@@ -204,7 +204,7 @@ class UploadController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/upload/delete",
+     *     path="/upload/delete",
      *     summary="Delete a file from S3",
      *     tags={"upload"},
      *     @OA\RequestBody(
@@ -286,7 +286,7 @@ class UploadController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/upload/presigned-url",
+     *     path="/upload/presigned-url",
      *     summary="Generate a presigned URL for direct upload",
      *     tags={"upload"},
      *     @OA\RequestBody(
@@ -374,7 +374,7 @@ class UploadController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/upload/file-info",
+     *     path="/upload/file-info",
      *     summary="Get file information from S3 URL",
      *     tags={"upload"},
      *     @OA\Parameter(

@@ -42,7 +42,7 @@ php artisan make:mcp-server NetwrkServer
 ```
 
 ### Step 3: Register MCP Routes
-x`
+
 The `routes/ai.php` file is already created. You can add custom MCP tools here.
 
 ## 🎯 How to Use MCP with Cursor

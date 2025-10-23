@@ -11,6 +11,10 @@ namespace App\Http\Controllers;
  *         email="support@netwrk.com"
  *     )
  * )
+ * @OA\Server(
+ *     url="http://127.0.0.1:8000",
+ *     description="Local development server"
+ * )
  * @OA\SecurityScheme(
  *     securityScheme="sanctum",
  *     type="http",

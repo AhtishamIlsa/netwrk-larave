@@ -16,7 +16,7 @@ class GroupsController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/groups/find-users-groups",
+     *     path="/groups/find-users-groups",
      *     summary="Get user's groups",
      *     tags={"groups"},
      *     security={{"sanctum":{}}},
@@ -80,7 +80,7 @@ class GroupsController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/groups/group-list",
+     *     path="/groups/group-list",
      *     summary="Get groups list",
      *     tags={"groups"},
      *     security={{"sanctum":{}}},
@@ -128,7 +128,7 @@ class GroupsController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/groups/create-group",
+     *     path="/groups/create-group",
      *     summary="Create a new group",
      *     tags={"groups"},
      *     security={{"sanctum":{}}},

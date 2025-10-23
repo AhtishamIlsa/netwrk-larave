@@ -34,7 +34,7 @@ class UserController extends Controller
     }
     /**
      * @OA\Get(
-     *     path="/api/users/graph/contact-industry",
+     *     path="/users/graph/contact-industry",
      *     summary="Get user contact industries graph data",
      *     tags={"users"},
      *     security={{"sanctum":{}}},
@@ -72,7 +72,7 @@ class UserController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/users/delete",
+     *     path="/users/delete",
      *     summary="Delete users",
      *     tags={"users"},
      *     security={{"sanctum":{}}},
@@ -114,7 +114,7 @@ class UserController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/users/delete/secondary-profile",
+     *     path="/users/delete/secondary-profile",
      *     summary="Delete secondary profile",
      *     tags={"users"},
      *     @OA\Parameter(
@@ -156,7 +156,7 @@ class UserController extends Controller
 
     /**
      * @OA\Patch(
-     *     path="/api/users/update-profile",
+     *     path="/users/update-profile",
      *     summary="Update user profile",
      *     tags={"users"},
      *     security={{"sanctum":{}}},
@@ -271,7 +271,7 @@ class UserController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/users/secondry-profile",
+     *     path="/users/secondry-profile",
      *     summary="Create secondary profile",
      *     tags={"users"},
      *     security={{"sanctum":{}}},
@@ -360,7 +360,7 @@ class UserController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/users/socials-preferences",
+     *     path="/users/socials-preferences",
      *     summary="Update user social preferences",
      *     tags={"users"},
      *     security={{"sanctum":{}}},
@@ -407,7 +407,7 @@ class UserController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/users/me",
+     *     path="/users/me",
      *     summary="Get current user profile",
      *     tags={"users"},
      *     security={{"sanctum":{}}},
@@ -532,7 +532,7 @@ class UserController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/users/dashboard",
+     *     path="/users/dashboard",
      *     summary="Get User Dashboard Data",
      *     tags={"users"},
      *     security={{"sanctum":{}}},
@@ -582,7 +582,7 @@ class UserController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/users/dashboard/graph/location",
+     *     path="/users/dashboard/graph/location",
      *     summary="Get User Dashboard Contact Location Graph Data",
      *     tags={"users"},
      *     security={{"sanctum":{}}},
@@ -734,7 +734,7 @@ class UserController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/users/industries",
+     *     path="/users/industries",
      *     summary="Get industries list",
      *     tags={"users"},
      *     @OA\Response(

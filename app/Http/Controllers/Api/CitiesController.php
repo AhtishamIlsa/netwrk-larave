@@ -14,7 +14,7 @@ class CitiesController extends Controller
 {
     /**
      * @OA\Post(
-     *     path="/api/cities/import",
+     *     path="/cities/import",
      *     summary="Import cities (cache for geocoding)",
      *     tags={"cities"},
      *     @OA\RequestBody(

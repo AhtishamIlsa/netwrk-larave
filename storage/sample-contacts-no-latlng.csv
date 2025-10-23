@@ -1,0 +1,12 @@
+firstName,lastName,email,company,position,phone,address,city,latitude,longitude,timezone,birthday,notes,tags,industries,websiteUrl,workPhone,homePhone,additionalAddresses,socials
+Alex,Johnson,alex.johnson+001@example.com,Acme Corp,Engineer,+1-555-1001,,Seattle,,,,,Test row 1,tag1;tag2,technology;software,https://example.com,,,,
+Brooke,Williams,brooke.williams+002@example.com,Globex,Manager,+1-555-1002,,New York,,,,,Test row 2,sales;enterprise,finance;saas,,,,,
+Chris,Brown,chris.brown+003@example.com,Initech,Analyst,+1-555-1003,,Chicago,,,,,Test row 3,,technology,,,,,
+Drew,Smith,drew.smith+004@example.com,Stark Industries,Architect,+1-555-1004,,San Francisco,,,,,Test row 4,tagA,technology;hardware,,,,,
+Evan,Taylor,evan.taylor+005@example.com,Wayne Enterprises,Director,+1-555-1005,,Austin,,,,,Test row 5,,,https://evan.example.com,,,,
+Faith,Moore,faith.moore+006@example.com,Wonka Inc,HR,+1-555-1006,,Boston,,,,,Test row 6,hr,healthcare,,,,,
+Gabe,Martin,gabe.martin+007@example.com,Globex,Engineer,+1-555-1007,,Denver,,,,,Test row 7,,,https://gabe.example.com,,,,
+Harper,Lee,harper.lee+008@example.com,Acme Corp,PM,+1-555-1008,,Phoenix,,,,,Test row 8,pm,technology;software,,,,,
+Ian,Clark,ian.clark+009@example.com,Initech,Designer,+1-555-1009,,Portland,,,,,Test row 9,,,https://ian.example.com,,,,
+Jade,Hall,jade.hall+010@example.com,Stark Industries,Engineer,+1-555-1010,,Miami,,,,,Test row 10,frontend,technology,,,,,
+Jaddde,dd,jaddde.hall+010@example.com,Stark Industries,Engineer,+1-555-1010,,Lahore,,,,,Test row 10,frontend,technology,,,,,

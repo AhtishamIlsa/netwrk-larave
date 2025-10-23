@@ -61,7 +61,15 @@ Route::prefix('contacts')->middleware('auth:api')->group(function () {
     // List and search contacts
     Route::get('/', [ContactsController::class, 'getContacts']);
     // Import CSV
-    Route::post('/import-csv', [ContactsController::class, 'importCsv']);
+    Route::post('/import-csv', [ContactsController::class, 'importCsvCopy']);
+    // Bulk Import CSV (Optimized)
+    Route::post('/import-csv-bulk', [ContactsController::class, 'importCsvBulk']);
+    // COPY Import CSV (PostgreSQL Optimized)
+    Route::post('/import-csv-copy', [ContactsController::class, 'importCsvCopy']);
+    
+    // Geocoding management
+    Route::post('/geocode-pending', [ContactsController::class, 'geocodePendingContacts']);
+    Route::get('/geocoding-status', [ContactsController::class, 'getGeocodingStatus']);
     
     // Analytics and stats
     Route::get('/indirect-contacts', [ContactsController::class, 'getIndirectContacts']);

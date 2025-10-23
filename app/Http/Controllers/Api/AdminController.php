@@ -19,7 +19,7 @@ class AdminController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/admins/dashboard/stats",
+     *     path="/admins/dashboard/stats",
      *     summary="Get admin dashboard statistics",
      *     tags={"admin"},
      *     @OA\Response(
@@ -121,7 +121,7 @@ class AdminController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/admins/dashboard/topUsers",
+     *     path="/admins/dashboard/topUsers",
      *     summary="Get top users for admin dashboard",
      *     tags={"admin"},
      *     @OA\Parameter(
@@ -250,7 +250,7 @@ class AdminController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/admins/dashboard/topGroups",
+     *     path="/admins/dashboard/topGroups",
      *     summary="Get top groups for admin dashboard",
      *     tags={"admin"},
      *     @OA\Parameter(
@@ -292,7 +292,7 @@ class AdminController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/admins/users",
+     *     path="/admins/users",
      *     summary="Get all users for admin management",
      *     tags={"admin"},
      *     @OA\Parameter(

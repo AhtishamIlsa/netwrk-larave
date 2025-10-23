@@ -39,7 +39,7 @@ class AuthController extends Controller
     }
     /**
      * @OA\Post(
-     *     path="/api/auth/sign-up-email-validation",
+     *     path="/auth/sign-up-email-validation",
      *     summary="Sign up email validation",
      *     tags={"onboarding"},
      *     @OA\RequestBody(
@@ -107,7 +107,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/auth/otp-verification",
+     *     path="/auth/otp-verification",
      *     summary="Verify OTP",
      *     tags={"onboarding"},
      *     @OA\RequestBody(
@@ -203,7 +203,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/auth/resend-otp",
+     *     path="/auth/resend-otp",
      *     summary="Resend OTP",
      *     tags={"onboarding"},
      *     @OA\RequestBody(
@@ -260,7 +260,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/auth/google-auth",
+     *     path="/auth/google-auth",
      *     summary="Google authentication",
      *     tags={"onboarding"},
      *     @OA\Parameter(
@@ -287,7 +287,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/auth/user-create",
+     *     path="/auth/user-create",
      *     summary="Create user after OTP verification",
      *     tags={"onboarding"},
      *     @OA\RequestBody(
@@ -391,7 +391,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/auth/login",
+     *     path="/auth/login",
      *     summary="User login",
      *     tags={"onboarding"},
      *     @OA\RequestBody(
@@ -478,7 +478,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/auth/reset-password",
+     *     path="/auth/reset-password",
      *     summary="Reset password request",
      *     tags={"onboarding"},
      *     @OA\RequestBody(
@@ -544,7 +544,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/auth/verify-reset-password",
+     *     path="/auth/verify-reset-password",
      *     summary="Verify reset password",
      *     tags={"onboarding"},
      *     @OA\Parameter(
@@ -613,7 +613,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/auth/direct-login",
+     *     path="/auth/direct-login",
      *     summary="Direct login",
      *     tags={"onboarding"},
      *     @OA\RequestBody(
@@ -673,7 +673,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/auth/direct-login-contact",
+     *     path="/auth/direct-login-contact",
      *     summary="Direct login via contact",
      *     tags={"onboarding"},
      *     @OA\RequestBody(
@@ -733,7 +733,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/api/auth/restore-account",
+     *     path="/auth/restore-account",
      *     summary="Restore account",
      *     tags={"onboarding"},
      *     @OA\RequestBody(

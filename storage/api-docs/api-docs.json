@@ -8,14 +8,23 @@
         },
         "version": "1.0.0"
     },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000",
+            "description": "Local development server"
+        },
+        {
+            "url": ""
+        }
+    ],
     "paths": {
-        "/api/admins/dashboard/stats": {
+        "/admins/dashboard/stats": {
             "get": {
                 "tags": [
                     "admin"
                 ],
                 "summary": "Get admin dashboard statistics",
-                "operationId": "3c4072b85fedbc4664bd80169e04ecf5",
+                "operationId": "a6b1d889051df39808b2b7f995bb7cb2",
                 "responses": {
                     "200": {
                         "description": "Dashboard statistics retrieved successfully",
@@ -109,13 +118,13 @@
                 }
             }
         },
-        "/api/admins/dashboard/topUsers": {
+        "/admins/dashboard/topUsers": {
             "get": {
                 "tags": [
                     "admin"
                 ],
                 "summary": "Get top users for admin dashboard",
-                "operationId": "98dfc89704c2cb7bff4c9250ecb5d344",
+                "operationId": "1c3f6f98ef4a05e10e944fc2040bb247",
                 "parameters": [
                     {
                         "name": "limit",
@@ -238,13 +247,13 @@
                 }
             }
         },
-        "/api/admins/dashboard/topGroups": {
+        "/admins/dashboard/topGroups": {
             "get": {
                 "tags": [
                     "admin"
                 ],
                 "summary": "Get top groups for admin dashboard",
-                "operationId": "684b3757605481a1a35ef2da6c7e2403",
+                "operationId": "70e9f854233497e82eebf2c5b5be4f0d",
                 "parameters": [
                     {
                         "name": "limit",
@@ -287,13 +296,13 @@
                 }
             }
         },
-        "/api/admins/users": {
+        "/admins/users": {
             "get": {
                 "tags": [
                     "admin"
                 ],
                 "summary": "Get all users for admin management",
-                "operationId": "71799ad7e7097e30f1415e2dea0a180d",
+                "operationId": "369814ee86446995986ac1dc9337b687",
                 "parameters": [
                     {
                         "name": "page",
@@ -381,13 +390,13 @@
                 }
             }
         },
-        "/api/auth/sign-up-email-validation": {
+        "/auth/sign-up-email-validation": {
             "post": {
                 "tags": [
                     "onboarding"
                 ],
                 "summary": "Sign up email validation",
-                "operationId": "efff2b4b315b822e06e0f2c89e08c658",
+                "operationId": "c14c76b0ee25dcc8753867e21f5fd8d3",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -475,13 +484,13 @@
                 }
             }
         },
-        "/api/auth/otp-verification": {
+        "/auth/otp-verification": {
             "post": {
                 "tags": [
                     "onboarding"
                 ],
                 "summary": "Verify OTP",
-                "operationId": "cf673663411c5589ff67b60c242181d6",
+                "operationId": "73532d6a3467348d1021f3d5f82c8d8f",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -540,13 +549,13 @@
                 }
             }
         },
-        "/api/auth/resend-otp": {
+        "/auth/resend-otp": {
             "post": {
                 "tags": [
                     "onboarding"
                 ],
                 "summary": "Resend OTP",
-                "operationId": "97c388571700f6d6d5ad133cd096195b",
+                "operationId": "6df6cdd1498709af94fae0a053ab5b22",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -590,13 +599,13 @@
                 }
             }
         },
-        "/api/auth/google-auth": {
+        "/auth/google-auth": {
             "get": {
                 "tags": [
                     "onboarding"
                 ],
                 "summary": "Google authentication",
-                "operationId": "7f24ab47ecfc722f86d98ce8c2d2dd38",
+                "operationId": "9c50fb733f5d94f704f95fc4da250f95",
                 "parameters": [
                     {
                         "name": "email",
@@ -615,13 +624,13 @@
                 }
             }
         },
-        "/api/auth/user-create": {
+        "/auth/user-create": {
             "post": {
                 "tags": [
                     "onboarding"
                 ],
                 "summary": "Create user after OTP verification",
-                "operationId": "67846ad57ad4aa09133d2f156193d350",
+                "operationId": "3afbd35d2e6451f7094f779d811d8d2c",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -696,13 +705,13 @@
                 }
             }
         },
-        "/api/auth/login": {
+        "/auth/login": {
             "post": {
                 "tags": [
                     "onboarding"
                 ],
                 "summary": "User login",
-                "operationId": "dd51a484b7fa0f97c7680fdbde14cf5f",
+                "operationId": "99d66635c4992aeaa6aa44ff653d0563",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -791,13 +800,13 @@
                 }
             }
         },
-        "/api/auth/reset-password": {
+        "/auth/reset-password": {
             "post": {
                 "tags": [
                     "onboarding"
                 ],
                 "summary": "Reset password request",
-                "operationId": "96e44e1ebcd811418fd95ee4c56162f0",
+                "operationId": "b8d03d5b689dcb65d3771f62d4f90a24",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -857,13 +866,13 @@
                 }
             }
         },
-        "/api/auth/verify-reset-password": {
+        "/auth/verify-reset-password": {
             "post": {
                 "tags": [
                     "onboarding"
                 ],
                 "summary": "Verify reset password",
-                "operationId": "6bfdf6452c9abf8db0b3a77e32ff3b1b",
+                "operationId": "42dfcbdc569c266c9c36462d877bf2d3",
                 "parameters": [
                     {
                         "name": "token",
@@ -939,13 +948,13 @@
                 }
             }
         },
-        "/api/auth/direct-login": {
+        "/auth/direct-login": {
             "post": {
                 "tags": [
                     "onboarding"
                 ],
                 "summary": "Direct login",
-                "operationId": "a38f58bbea14316fa53b6e9dd8d67f29",
+                "operationId": "0035ef5181c6a7f1df0f22330ed69edb",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1024,13 +1033,13 @@
                 }
             }
         },
-        "/api/auth/direct-login-contact": {
+        "/auth/direct-login-contact": {
             "post": {
                 "tags": [
                     "onboarding"
                 ],
                 "summary": "Direct login via contact",
-                "operationId": "e1f7da7beb6aa0bcccb41827c0897e07",
+                "operationId": "84f366a00091c34bed9d6043ab8d1ff9",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1109,13 +1118,13 @@
                 }
             }
         },
-        "/api/auth/restore-account": {
+        "/auth/restore-account": {
             "put": {
                 "tags": [
                     "onboarding"
                 ],
                 "summary": "Restore account",
-                "operationId": "60e81516c50e2c5ff9dd8221841f18bc",
+                "operationId": "a35b3373a2d1e3356fdb68ee6091df6d",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1188,13 +1197,13 @@
                 }
             }
         },
-        "/api/cities/import": {
+        "/cities/import": {
             "post": {
                 "tags": [
                     "cities"
                 ],
                 "summary": "Import cities (cache for geocoding)",
-                "operationId": "b3e0ebe310265ce7b8e8c9a6e92e8f8c",
+                "operationId": "29a61f4242848ceede5026e8615b62f0",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1256,13 +1265,13 @@
                 }
             }
         },
-        "/api/contacts": {
+        "/contacts": {
             "get": {
                 "tags": [
                     "contacts"
                 ],
                 "summary": "Get contacts list",
-                "operationId": "93d1290cbc1b6e0dfa826aa15ef87dce",
+                "operationId": "7f32c9bebdb674b0eba4c5e1d92b4fcd",
                 "parameters": [
                     {
                         "name": "page",
@@ -1363,13 +1372,13 @@
                 ]
             }
         },
-        "/api/contacts/indirect-contacts": {
+        "/contacts/indirect-contacts": {
             "get": {
                 "tags": [
                     "contacts"
                 ],
                 "summary": "Get indirect contacts count",
-                "operationId": "dcf5b20258f95e9f13f97f54790ab379",
+                "operationId": "0eefa50c9588302c3eb321752fdb42e9",
                 "responses": {
                     "200": {
                         "description": "Success",
@@ -1411,13 +1420,13 @@
                 ]
             }
         },
-        "/api/contacts/graph/{year}": {
+        "/contacts/graph/{year}": {
             "get": {
                 "tags": [
                     "contacts"
                 ],
                 "summary": "Get contacts growth chart data",
-                "operationId": "1f9503fc93acb4fd435eb8a03649b3ab",
+                "operationId": "ea309f85e577718123f62c7d46e027d2",
                 "parameters": [
                     {
                         "name": "year",
@@ -1486,13 +1495,13 @@
                 ]
             }
         },
-        "/api/contacts/create-contact": {
+        "/contacts/create-contact": {
             "post": {
                 "tags": [
                     "contacts"
                 ],
                 "summary": "Create a new contact",
-                "operationId": "5f53a539ddb9c5e7bb98158545c44903",
+                "operationId": "5da87f325fba1ee1f3de00b049d8cb26",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1557,13 +1566,13 @@
                 ]
             }
         },
-        "/api/contacts/get-contact/{contactId}": {
+        "/contacts/get-contact/{contactId}": {
             "get": {
                 "tags": [
                     "contacts"
                 ],
                 "summary": "Get a single contact",
-                "operationId": "7242ddfadd2fffc36fcc531465e6d399",
+                "operationId": "ef0e4e567368de1e7f809dc4acea15e2",
                 "parameters": [
                     {
                         "name": "contactId",
@@ -1589,13 +1598,13 @@
                 ]
             }
         },
-        "/api/contacts/update-contact/{contactId}": {
+        "/contacts/update-contact/{contactId}": {
             "patch": {
                 "tags": [
                     "contacts"
                 ],
                 "summary": "Update a contact",
-                "operationId": "7fba05fc3adb7dc964f8010aa3020b73",
+                "operationId": "b589c57adf9214e8bc20c167e3567cd8",
                 "parameters": [
                     {
                         "name": "contactId",
@@ -1645,13 +1654,13 @@
                 ]
             }
         },
-        "/api/contacts/delete": {
+        "/contacts/delete": {
             "post": {
                 "tags": [
                     "contacts"
                 ],
                 "summary": "Delete contacts",
-                "operationId": "d2ffb2cfab2c52dbb30d869baae8d6d9",
+                "operationId": "558fdc1e3b774b7e64e38c17d4abbbab",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1685,13 +1694,13 @@
                 ]
             }
         },
-        "/api/contacts/import-csv": {
+        "/contacts/import-csv": {
             "post": {
                 "tags": [
                     "contacts"
                 ],
                 "summary": "Import contacts from CSV",
-                "operationId": "a4a9caa96077a418d7bbfeb7db6394d2",
+                "operationId": "ba1eea2747330d1f6d1716b139c8203a",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1770,13 +1779,281 @@
                 ]
             }
         },
-        "/api/groups/find-users-groups": {
+        "/contacts/import-csv-bulk": {
+            "post": {
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Import contacts from CSV file (Bulk Optimized)",
+                "description": "Import contacts from CSV file using bulk operations for better performance with large datasets",
+                "operationId": "importCsvBulk",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "file": {
+                                        "description": "CSV file to import",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Import completed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Bulk import completed"
+                                        },
+                                        "totalRecords": {
+                                            "type": "integer",
+                                            "example": 1000
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "summary": {
+                                                    "properties": {
+                                                        "totalRows": {
+                                                            "type": "integer",
+                                                            "example": 1000
+                                                        },
+                                                        "created": {
+                                                            "type": "integer",
+                                                            "example": 950
+                                                        },
+                                                        "skipped": {
+                                                            "type": "integer",
+                                                            "example": 50
+                                                        },
+                                                        "processingTime": {
+                                                            "type": "string",
+                                                            "example": "2.5s"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/contacts/import-csv-copy": {
+            "post": {
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Import contacts from CSV file (PostgreSQL COPY Optimized)",
+                "description": "Import contacts using PostgreSQL COPY command with temporary table and ON CONFLICT upsert for maximum performance. CSV must have headers: user_id, first_name, last_name, email, position, company_name, phone, work_phone, home_phone, address, additional_addresses, city, latitude, longitude, timezone, birthday, notes, tags, industries, socials, title, role, website_url",
+                "operationId": "importCsvCopy",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "file": {
+                                        "description": "CSV file to import",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Import completed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "COPY import completed"
+                                        },
+                                        "totalRecords": {
+                                            "type": "integer",
+                                            "example": 10000
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "summary": {
+                                                    "properties": {
+                                                        "totalRows": {
+                                                            "type": "integer",
+                                                            "example": 10000
+                                                        },
+                                                        "created": {
+                                                            "type": "integer",
+                                                            "example": 9500
+                                                        },
+                                                        "updated": {
+                                                            "type": "integer",
+                                                            "example": 500
+                                                        },
+                                                        "processingTime": {
+                                                            "type": "string",
+                                                            "example": "1.2s"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/contacts/geocode-pending": {
+            "post": {
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Start geocoding for contacts without coordinates",
+                "description": "Manually dispatch geocoding job for contacts that need coordinates",
+                "operationId": "geocodePendingContacts",
+                "responses": {
+                    "200": {
+                        "description": "Geocoding job dispatched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Geocoding job dispatched"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "contactsNeedingGeocoding": {
+                                                    "type": "integer",
+                                                    "example": 150
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/contacts/geocoding-status": {
+            "get": {
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Get geocoding status for user contacts",
+                "description": "Check how many contacts need geocoding and their status",
+                "operationId": "getGeocodingStatus",
+                "responses": {
+                    "200": {
+                        "description": "Geocoding status retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "totalContacts": {
+                                                    "type": "integer",
+                                                    "example": 1000
+                                                },
+                                                "contactsWithCoordinates": {
+                                                    "type": "integer",
+                                                    "example": 850
+                                                },
+                                                "contactsNeedingGeocoding": {
+                                                    "type": "integer",
+                                                    "example": 150
+                                                },
+                                                "geocodingProgress": {
+                                                    "type": "string",
+                                                    "example": "85%"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/groups/find-users-groups": {
             "get": {
                 "tags": [
                     "groups"
                 ],
                 "summary": "Get user's groups",
-                "operationId": "e3ab1542c903a24d036edf6a57f0d45d",
+                "operationId": "95ec2f3a75f890a59e6b2a213ab5d8aa",
                 "parameters": [
                     {
                         "name": "page",
@@ -1852,13 +2129,13 @@
                 ]
             }
         },
-        "/api/groups/group-list": {
+        "/groups/group-list": {
             "get": {
                 "tags": [
                     "groups"
                 ],
                 "summary": "Get groups list",
-                "operationId": "6f1dc2e12ea2211129924ff84f9060a4",
+                "operationId": "dfe8928198d4a5a39423a99721561d73",
                 "parameters": [
                     {
                         "name": "page",
@@ -1893,13 +2170,13 @@
                 ]
             }
         },
-        "/api/groups/create-group": {
+        "/groups/create-group": {
             "post": {
                 "tags": [
                     "groups"
                 ],
                 "summary": "Create a new group",
-                "operationId": "4e4a999cdfd8916ddf55989a5f5f6e8d",
+                "operationId": "300c6af5c028bb80c64294546f48a39c",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1935,13 +2212,13 @@
                 ]
             }
         },
-        "/api/upload": {
+        "/upload": {
             "post": {
                 "tags": [
                     "upload"
                 ],
                 "summary": "Upload a file to S3",
-                "operationId": "66471c664a767fa3219af53f2d34fc4e",
+                "operationId": "9795124f6acf6befebd02b4376d24e97",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1965,48 +2242,15 @@
                     }
                 },
                 "responses": {
-                    "200": {
+                    "201": {
                         "description": "File uploaded successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "statusCode": {
-                                            "type": "integer",
-                                            "example": 200
-                                        },
-                                        "message": {
+                                        "url": {
                                             "type": "string",
-                                            "example": "File uploaded successfully"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "url": {
-                                                    "type": "string",
-                                                    "example": "https://bucket.s3.amazonaws.com/uploads/file.jpg"
-                                                },
-                                                "path": {
-                                                    "type": "string",
-                                                    "example": "uploads/uuid-filename.jpg"
-                                                },
-                                                "filename": {
-                                                    "type": "string",
-                                                    "example": "uuid-filename.jpg"
-                                                },
-                                                "original_name": {
-                                                    "type": "string",
-                                                    "example": "original-filename.jpg"
-                                                },
-                                                "size": {
-                                                    "type": "integer",
-                                                    "example": 1024
-                                                },
-                                                "mime_type": {
-                                                    "type": "string",
-                                                    "example": "image/jpeg"
-                                                }
-                                            },
-                                            "type": "object"
+                                            "example": "https://bucket.s3.amazonaws.com/uploads/file.jpg"
                                         }
                                     },
                                     "type": "object"
@@ -2063,13 +2307,13 @@
                 }
             }
         },
-        "/api/upload/multiple": {
+        "/upload/multiple": {
             "post": {
                 "tags": [
                     "upload"
                 ],
                 "summary": "Upload multiple files to S3",
-                "operationId": "72bff4b9aa8ad54e40d81196be29a99b",
+                "operationId": "9256f78f3d1bec5d802ab3e54b260155",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2148,13 +2392,13 @@
                 }
             }
         },
-        "/api/upload/delete": {
+        "/upload/delete": {
             "delete": {
                 "tags": [
                     "upload"
                 ],
                 "summary": "Delete a file from S3",
-                "operationId": "bd17107904b604e9d147b7b6c6093a03",
+                "operationId": "ff0b2a4b6bbe193a7e7fbf354c34ac3d",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2222,13 +2466,13 @@
                 }
             }
         },
-        "/api/upload/presigned-url": {
+        "/upload/presigned-url": {
             "post": {
                 "tags": [
                     "upload"
                 ],
                 "summary": "Generate a presigned URL for direct upload",
-                "operationId": "fe64d160e1c6e58519df93fdb3dd2238",
+                "operationId": "b6c2cda865969173ed18ff664bf83890",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2301,13 +2545,13 @@
                 }
             }
         },
-        "/api/upload/file-info": {
+        "/upload/file-info": {
             "get": {
                 "tags": [
                     "upload"
                 ],
                 "summary": "Get file information from S3 URL",
-                "operationId": "70d98e527dd1f40f52336e16cfad616b",
+                "operationId": "361d0b61f8dc3eff640905924048c100",
                 "parameters": [
                     {
                         "name": "url",
@@ -2391,13 +2635,13 @@
                 }
             }
         },
-        "/api/users/graph/contact-industry": {
+        "/users/graph/contact-industry": {
             "get": {
                 "tags": [
                     "users"
                 ],
                 "summary": "Get user contact industries graph data",
-                "operationId": "4ef81b0c21dfaf90780d690ec16a12fc",
+                "operationId": "2c2e1e4736b74027f0ab9e1ec9813fe6",
                 "responses": {
                     "200": {
                         "description": "Success",
@@ -2429,13 +2673,13 @@
                 ]
             }
         },
-        "/api/users/delete": {
+        "/users/delete": {
             "post": {
                 "tags": [
                     "users"
                 ],
                 "summary": "Delete users",
-                "operationId": "ccf640e7e43a91c1f24f834a21db88f9",
+                "operationId": "c52083299b297da3f9693d517c58a417",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2489,13 +2733,13 @@
                 ]
             }
         },
-        "/api/users/delete/secondary-profile": {
+        "/users/delete/secondary-profile": {
             "delete": {
                 "tags": [
                     "users"
                 ],
                 "summary": "Delete secondary profile",
-                "operationId": "0507c96558698a444c7a694f9270cf90",
+                "operationId": "654219a5c7485202880c8310f35961b7",
                 "parameters": [
                     {
                         "name": "userId",
@@ -2530,13 +2774,13 @@
                 }
             }
         },
-        "/api/users/update-profile": {
+        "/users/update-profile": {
             "patch": {
                 "tags": [
                     "users"
                 ],
                 "summary": "Update user profile",
-                "operationId": "e4f4c5c1a117d0d5e19e2360a5aaf3ab",
+                "operationId": "72c6706416f12794813b3ed1f4224d5c",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2631,13 +2875,13 @@
                 ]
             }
         },
-        "/api/users/secondry-profile": {
+        "/users/secondry-profile": {
             "post": {
                 "tags": [
                     "users"
                 ],
                 "summary": "Create secondary profile",
-                "operationId": "c2283b0b40c95de7280d067b4d28ee57",
+                "operationId": "1670d61d53709b3c9bc3d0c98779d2e1",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2720,13 +2964,13 @@
                 ]
             }
         },
-        "/api/users/socials-preferences": {
+        "/users/socials-preferences": {
             "post": {
                 "tags": [
                     "users"
                 ],
                 "summary": "Update user social preferences",
-                "operationId": "5d3dadbbfc49e933f77b6de38d36ac08",
+                "operationId": "6befe5b361f6c0dc4dbf13ea040255e1",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2789,13 +3033,13 @@
                 ]
             }
         },
-        "/api/users/me": {
+        "/users/me": {
             "get": {
                 "tags": [
                     "users"
                 ],
                 "summary": "Get current user profile",
-                "operationId": "8f1353342e8459aea306a7a91b377112",
+                "operationId": "93b9d43bf6cc5193f51ebeb8863d054d",
                 "responses": {
                     "200": {
                         "description": "Success",
@@ -2830,13 +3074,13 @@
                 ]
             }
         },
-        "/api/users/dashboard": {
+        "/users/dashboard": {
             "get": {
                 "tags": [
                     "users"
                 ],
                 "summary": "Get User Dashboard Data",
-                "operationId": "3fca277fd3f58ad147580625ff111213",
+                "operationId": "b3036bfa69fccfb1142472e5c4d9a3fd",
                 "responses": {
                     "200": {
                         "description": "Dashboard data retrieved successfully",
@@ -2889,13 +3133,13 @@
                 ]
             }
         },
-        "/api/users/dashboard/graph/location": {
+        "/users/dashboard/graph/location": {
             "get": {
                 "tags": [
                     "users"
                 ],
                 "summary": "Get User Dashboard Contact Location Graph Data",
-                "operationId": "7c9a9fe7a62501454a355fd34f9a07a1",
+                "operationId": "55ce288de8be48a7206af5ef89005fb9",
                 "parameters": [
                     {
                         "name": "page",
@@ -2984,13 +3228,13 @@
                 ]
             }
         },
-        "/api/users/industries": {
+        "/users/industries": {
             "get": {
                 "tags": [
                     "users"
                 ],
                 "summary": "Get industries list",
-                "operationId": "8ec16560928df0aa2a8709c68df7ac91",
+                "operationId": "3ef069edb4f74303c7e58e71fe93c6d3",
                 "responses": {
                     "200": {
                         "description": "Industries retrieved successfully",
@@ -3065,6 +3309,10 @@
         {
             "name": "cities",
             "description": "cities"
+        },
+        {
+            "name": "Contacts",
+            "description": "Contacts"
         }
     ]
 }
